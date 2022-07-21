@@ -18,10 +18,11 @@ public class RegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    //BCrypt
+    //BCrypt + setRole by default
     @Transactional
     public void register(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
+        person.setRole("ROLE_USER");
         peopleRepository.save(person);
     }
 }
