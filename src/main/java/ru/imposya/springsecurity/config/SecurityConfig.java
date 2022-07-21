@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.imposya.springsecurity.services.PersonDetailsService;
@@ -25,12 +26,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(personDetailsService);
+        auth.userDetailsService(personDetailsService)
+                .passwordEncoder(getPasswordEncoder());
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable() //тест
-                .authorizeRequests().antMatchers("/auth/login", "/error", "/auth/registration").permitAll()
+        http.authorizeRequests().antMatchers("/auth/login", "/error", "/auth/registration").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().loginPage("/auth/login")
@@ -40,10 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().logout().logoutUrl("/logout").logoutSuccessUrl("/auth/login");
     }
 
-    //пока без шифрования
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
 }
